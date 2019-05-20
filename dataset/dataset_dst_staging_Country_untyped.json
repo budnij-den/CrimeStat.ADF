@@ -1,0 +1,86 @@
+{
+	"name": "dataset_dst_staging_Country_untyped",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "crimestatdwh",
+			"type": "LinkedServiceReference"
+		},
+		"type": "AzureSqlTable",
+		"schema": [
+			{
+				"name": "name",
+				"type": "nvarchar"
+			},
+			{
+				"name": "alpha-2",
+				"type": "nvarchar"
+			},
+			{
+				"name": "alpha-3",
+				"type": "nvarchar"
+			},
+			{
+				"name": "country-code",
+				"type": "nvarchar"
+			},
+			{
+				"name": "iso_3166-2",
+				"type": "nvarchar"
+			},
+			{
+				"name": "region",
+				"type": "nvarchar"
+			},
+			{
+				"name": "sub-region",
+				"type": "nvarchar"
+			},
+			{
+				"name": "intermediate-region",
+				"type": "nvarchar"
+			},
+			{
+				"name": "region-code",
+				"type": "nvarchar"
+			},
+			{
+				"name": "sub-region-code",
+				"type": "nvarchar"
+			},
+			{
+				"name": "intermediate-region-code",
+				"type": "nvarchar"
+			},
+			{
+				"name": "sysETLrunId",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "sysCreatedAt",
+				"type": "datetime",
+				"precision": 23,
+				"scale": 3
+			},
+			{
+				"name": "sysChangedAt",
+				"type": "datetime",
+				"precision": 23,
+				"scale": 3
+			},
+			{
+				"name": "sysCreatedBy",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "sysChangedBy",
+				"type": "int",
+				"precision": 10
+			}
+		],
+		"typeProperties": {
+			"tableName": "[staging].[Country_untyped]"
+		}
+	}
+}
