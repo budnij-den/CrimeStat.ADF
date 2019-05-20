@@ -1,0 +1,388 @@
+{
+	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"type": "string",
+			"metadata": "Data Factory Name",
+			"defaultValue": "crimestatdafaapdev"
+		},
+		"crimestatstacap_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'crimestatstacap'"
+		},
+		"crimestatdwh_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'crimestatdwh'"
+		}
+	},
+	"variables": {
+		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
+	},
+	"resources": [
+		{
+			"name": "[concat(parameters('factoryName'), '/crimestatstacap')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureBlobStorage",
+				"typeProperties": {
+					"connectionString": "[parameters('crimestatstacap_connectionString')]"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/crimestatdwh')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureSqlDatabase",
+				"typeProperties": {
+					"connectionString": "[parameters('crimestatdwh_connectionString')]"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/dataset_src_country')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "crimestatstacap",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"fileName": "ISOcountries.csv",
+						"folderPath": "CrimeStat.Source.Countries",
+						"container": "crimestat-sourcefiles"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "name",
+						"type": "String"
+					},
+					{
+						"name": "alpha-2",
+						"type": "String"
+					},
+					{
+						"name": "alpha-3",
+						"type": "String"
+					},
+					{
+						"name": "country-code",
+						"type": "String"
+					},
+					{
+						"name": "iso_3166-2",
+						"type": "String"
+					},
+					{
+						"name": "region",
+						"type": "String"
+					},
+					{
+						"name": "sub-region",
+						"type": "String"
+					},
+					{
+						"name": "intermediate-region",
+						"type": "String"
+					},
+					{
+						"name": "region-code",
+						"type": "String"
+					},
+					{
+						"name": "sub-region-code",
+						"type": "String"
+					},
+					{
+						"name": "intermediate-region-code",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/crimestatstacap')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/dataset_dst_staging_Country_untyped')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "crimestatdwh",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "name",
+						"type": "nvarchar"
+					},
+					{
+						"name": "alpha-2",
+						"type": "nvarchar"
+					},
+					{
+						"name": "alpha-3",
+						"type": "nvarchar"
+					},
+					{
+						"name": "country-code",
+						"type": "nvarchar"
+					},
+					{
+						"name": "iso_3166-2",
+						"type": "nvarchar"
+					},
+					{
+						"name": "region",
+						"type": "nvarchar"
+					},
+					{
+						"name": "sub-region",
+						"type": "nvarchar"
+					},
+					{
+						"name": "intermediate-region",
+						"type": "nvarchar"
+					},
+					{
+						"name": "region-code",
+						"type": "nvarchar"
+					},
+					{
+						"name": "sub-region-code",
+						"type": "nvarchar"
+					},
+					{
+						"name": "intermediate-region-code",
+						"type": "nvarchar"
+					},
+					{
+						"name": "sysETLrunId",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "sysCreatedAt",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "sysChangedAt",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "sysCreatedBy",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "sysChangedBy",
+						"type": "int",
+						"precision": 10
+					}
+				],
+				"typeProperties": {
+					"tableName": "[[staging].[Country_untyped]"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/crimestatdwh')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Source-Country-Load-Staging')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "copy-country-staging",
+						"type": "Copy",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "DelimitedTextSource",
+								"storeSettings": {
+									"type": "AzureBlobStorageReadSetting"
+								},
+								"formatSettings": {
+									"type": "DelimitedTextReadSetting"
+								}
+							},
+							"sink": {
+								"type": "AzureSqlSink",
+								"preCopyScript": "  TRUNCATE TABLE [staging].[Country_untyped];"
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"name": "name",
+											"type": "String"
+										},
+										"sink": {
+											"name": "name",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "alpha-2",
+											"type": "String"
+										},
+										"sink": {
+											"name": "alpha-2",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "alpha-3",
+											"type": "String"
+										},
+										"sink": {
+											"name": "alpha-3",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "country-code",
+											"type": "String"
+										},
+										"sink": {
+											"name": "country-code",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "iso_3166-2",
+											"type": "String"
+										},
+										"sink": {
+											"name": "iso_3166-2",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "region",
+											"type": "String"
+										},
+										"sink": {
+											"name": "region",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "sub-region",
+											"type": "String"
+										},
+										"sink": {
+											"name": "sub-region",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "intermediate-region",
+											"type": "String"
+										},
+										"sink": {
+											"name": "intermediate-region",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "region-code",
+											"type": "String"
+										},
+										"sink": {
+											"name": "region-code",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "sub-region-code",
+											"type": "String"
+										},
+										"sink": {
+											"name": "sub-region-code",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "intermediate-region-code",
+											"type": "String"
+										},
+										"sink": {
+											"name": "intermediate-region-code",
+											"type": "String"
+										}
+									}
+								]
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "dataset_src_country",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "dataset_dst_staging_Country_untyped",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					}
+				],
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/dataset_src_country')]",
+				"[concat(variables('factoryId'), '/datasets/dataset_dst_staging_Country_untyped')]"
+			]
+		}
+	]
+}
