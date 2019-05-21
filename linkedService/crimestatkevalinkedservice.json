@@ -1,0 +1,9 @@
+{
+	"name": "crimestatkevalinkedservice",
+	"properties": {
+		"type": "AzureKeyVault",
+		"typeProperties": {
+			"baseUrl": "https://crimestatkevaapdev.vault.azure.net/"
+		}
+	}
+}
