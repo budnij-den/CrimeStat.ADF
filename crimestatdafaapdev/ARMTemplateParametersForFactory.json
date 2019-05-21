@@ -5,11 +5,14 @@
 		"factoryName": {
 			"value": "crimestatdafaapdev"
 		},
+		"crimestatdwh_connectionString": {
+			"value": ""
+		},
 		"crimestatstacap_connectionString": {
 			"value": ""
 		},
-		"crimestatdwh_connectionString": {
-			"value": ""
+		"crimestatkevalinkedservice_properties_typeProperties_baseUrl": {
+			"value": "https://crimestatkevaapdev.vault.azure.net/"
 		}
 	}
 }

@@ -7,32 +7,23 @@
 			"metadata": "Data Factory Name",
 			"defaultValue": "crimestatdafaapdev"
 		},
+		"crimestatdwh_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'crimestatdwh'"
+		},
 		"crimestatstacap_connectionString": {
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'crimestatstacap'"
 		},
-		"crimestatdwh_connectionString": {
-			"type": "secureString",
-			"metadata": "Secure string for 'connectionString' of 'crimestatdwh'"
+		"crimestatkevalinkedservice_properties_typeProperties_baseUrl": {
+			"type": "string",
+			"defaultValue": "https://crimestatkevaapdev.vault.azure.net/"
 		}
 	},
 	"variables": {
 		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
 	},
 	"resources": [
-		{
-			"name": "[concat(parameters('factoryName'), '/crimestatstacap')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"type": "AzureBlobStorage",
-				"typeProperties": {
-					"connectionString": "[parameters('crimestatstacap_connectionString')]"
-				}
-			},
-			"dependsOn": []
-		},
 		{
 			"name": "[concat(parameters('factoryName'), '/crimestatdwh')]",
 			"type": "Microsoft.DataFactory/factories/linkedServices",
@@ -47,78 +38,30 @@
 			"dependsOn": []
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/dataset_src_country')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
+			"name": "[concat(parameters('factoryName'), '/crimestatstacap')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
 			"apiVersion": "2018-06-01",
 			"properties": {
-				"linkedServiceName": {
-					"referenceName": "crimestatstacap",
-					"type": "LinkedServiceReference"
-				},
 				"annotations": [],
-				"type": "DelimitedText",
+				"type": "AzureBlobStorage",
 				"typeProperties": {
-					"location": {
-						"type": "AzureBlobStorageLocation",
-						"fileName": "ISOcountries.csv",
-						"folderPath": "CrimeStat.Source.Countries",
-						"container": "crimestat-sourcefiles"
-					},
-					"columnDelimiter": ",",
-					"escapeChar": "\\",
-					"firstRowAsHeader": true,
-					"quoteChar": "\""
-				},
-				"schema": [
-					{
-						"name": "name",
-						"type": "String"
-					},
-					{
-						"name": "alpha-2",
-						"type": "String"
-					},
-					{
-						"name": "alpha-3",
-						"type": "String"
-					},
-					{
-						"name": "country-code",
-						"type": "String"
-					},
-					{
-						"name": "iso_3166-2",
-						"type": "String"
-					},
-					{
-						"name": "region",
-						"type": "String"
-					},
-					{
-						"name": "sub-region",
-						"type": "String"
-					},
-					{
-						"name": "intermediate-region",
-						"type": "String"
-					},
-					{
-						"name": "region-code",
-						"type": "String"
-					},
-					{
-						"name": "sub-region-code",
-						"type": "String"
-					},
-					{
-						"name": "intermediate-region-code",
-						"type": "String"
-					}
-				]
+					"connectionString": "[parameters('crimestatstacap_connectionString')]"
+				}
 			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/crimestatstacap')]"
-			]
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/crimestatkevalinkedservice')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureKeyVault",
+				"typeProperties": {
+					"baseUrl": "[parameters('crimestatkevalinkedservice_properties_typeProperties_baseUrl')]"
+				}
+			},
+			"dependsOn": []
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/dataset_dst_staging_Country_untyped')]",
@@ -210,6 +153,80 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/linkedServices/crimestatdwh')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/dataset_src_country')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "crimestatstacap",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"fileName": "ISOcountries.csv",
+						"folderPath": "CrimeStat.Source.Countries",
+						"container": "crimestat-sourcefiles"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "name",
+						"type": "String"
+					},
+					{
+						"name": "alpha-2",
+						"type": "String"
+					},
+					{
+						"name": "alpha-3",
+						"type": "String"
+					},
+					{
+						"name": "country-code",
+						"type": "String"
+					},
+					{
+						"name": "iso_3166-2",
+						"type": "String"
+					},
+					{
+						"name": "region",
+						"type": "String"
+					},
+					{
+						"name": "sub-region",
+						"type": "String"
+					},
+					{
+						"name": "intermediate-region",
+						"type": "String"
+					},
+					{
+						"name": "region-code",
+						"type": "String"
+					},
+					{
+						"name": "sub-region-code",
+						"type": "String"
+					},
+					{
+						"name": "intermediate-region-code",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/crimestatstacap')]"
 			]
 		},
 		{
@@ -382,6 +399,33 @@
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/dataset_src_country')]",
 				"[concat(variables('factoryId'), '/datasets/dataset_dst_staging_Country_untyped')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/CrimeStat-Load')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Execute_Source-Country-Load-Staging",
+						"type": "ExecutePipeline",
+						"dependsOn": [],
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "Source-Country-Load-Staging",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {}
+						}
+					}
+				],
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/pipelines/Source-Country-Load-Staging')]"
 			]
 		}
 	]

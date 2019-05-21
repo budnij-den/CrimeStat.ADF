@@ -7,13 +7,17 @@
 			"metadata": "Data Factory Name",
 			"defaultValue": "crimestatdafaapdev"
 		},
+		"crimestatdwh_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'crimestatdwh'"
+		},
 		"crimestatstacap_connectionString": {
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'crimestatstacap'"
 		},
-		"crimestatdwh_connectionString": {
-			"type": "secureString",
-			"metadata": "Secure string for 'connectionString' of 'crimestatdwh'"
+		"crimestatkevalinkedservice_properties_typeProperties_baseUrl": {
+			"type": "string",
+			"defaultValue": "https://crimestatkevaapdev.vault.azure.net/"
 		},
 		"containerUri": {
 			"type": "string",
@@ -42,11 +46,14 @@
 					"factoryName": {
 						"value": "[parameters('factoryName')]"
 					},
+					"crimestatdwh_connectionString": {
+						"value": "[parameters('crimestatdwh_connectionString')]"
+					},
 					"crimestatstacap_connectionString": {
 						"value": "[parameters('crimestatstacap_connectionString')]"
 					},
-					"crimestatdwh_connectionString": {
-						"value": "[parameters('crimestatdwh_connectionString')]"
+					"crimestatkevalinkedservice_properties_typeProperties_baseUrl": {
+						"value": "[parameters('crimestatkevalinkedservice_properties_typeProperties_baseUrl')]"
 					}
 				}
 			},
